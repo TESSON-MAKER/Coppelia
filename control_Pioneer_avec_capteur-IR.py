@@ -17,6 +17,11 @@ port = 19997
 scene = './Pioneer.ttt'
 position_init = [3,2,to_rad(0)]
 
+noDetectionDist=0.5
+maxDetectionDist=0.2
+
+braitenbergL={-0.2,-0.4,-0.6,-0.8,-1,-1.2,-1.4,-1.6, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+braitenbergR={-1.6,-1.4,-1.2,-1,-0.8,-0.6,-0.4,-0.2, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
 
 print ('Program started')
 vrep.simxFinish(-1) # just in case, close all opened connections
@@ -28,7 +33,7 @@ if client_id!=-1:
     res, pioneer = vrep.simxGetObjectHandle(client_id, 'Pioneer_p3dx', vrep.simx_opmode_oneshot_wait)
     res, left_motor = vrep.simxGetObjectHandle(client_id, 'Pioneer_p3dx_leftMotor', vrep.simx_opmode_oneshot_wait)
     res, right_motor = vrep.simxGetObjectHandle(client_id, 'Pioneer_p3dx_rightMotor', vrep.simx_opmode_oneshot_wait)
-    
+   
 
     # For Sensors
     sensor_handles=np.zeros(16)
@@ -74,6 +79,16 @@ if client_id!=-1:
             detection_IR[i-1]=distToObject
             print(detectedPoint)
             print(distToObject)
+            
+            
+        if (res>0) and (distToObject<noDetectionDist):
+            if (distToObject<maxDetectionDist):
+                distToObject=maxDetectionDist
+                
+                
+        for i in range(1,17) : 
+                    command[0]=command[0]+braitenbergL[i]*detection_IR[i]
+                    command[1]=command[1]+braitenbergR[i]*detection_IR[i]
 
 
         delta_t = (vrep.simxGetLastCmdTime(client_id)-current_time)/1000
