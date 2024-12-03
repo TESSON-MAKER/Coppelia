@@ -14,7 +14,7 @@ def to_deg(rad):
 # simulation config
 ip = '127.0.0.1'
 port = 19997
-scene = './pioneer.ttt'
+scene = './Scene Pioneer_murs.ttt'
 position_init = [0,0,to_rad(0)]
 
 
@@ -33,7 +33,7 @@ if client_id!=-1:
 
     position = position_init 
 
-    command =  [-0.,0.2]
+    command =  [0.,0.]
     
     continue_running = True
     
