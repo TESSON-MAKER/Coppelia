@@ -1,19 +1,17 @@
 from BackProp_Python_v2 import NN
 from vrep_pioneer_simulation import VrepPioneerSimulation
-#from rdn import Pioneer # rdn pour ROS avec le pioneer
-#import rospy
 import matplotlib
 from online_trainer import OnlineTrainer
 import json
 import threading
 
-
+# Initialisation du robot et du réseau de neurones
 robot = VrepPioneerSimulation()
-#robot = Pioneer(rospy)
-HL_size= 30 # nbre neurons of Hiden layer
+HL_size = 40  # Nombre de neurones dans la couche cachée
 network = NN(3, HL_size, 2)
 
-choice = input('Do you want to load previous network? (y/n) --> ')
+# Chargement du réseau précédent si nécessaire
+choice = input('Do you want to load the previous network? (y/n) --> ')
 if choice == 'y':
     with open('last_w.json') as fp:
         json_obj = json.load(fp)
@@ -27,8 +25,9 @@ if choice == 'y':
 
 trainer = OnlineTrainer(robot, network)
 
+# Configuration de l'entraînement
 choice = ''
-while choice!='y' and choice !='n':
+while choice != 'y' and choice != 'n':
     choice = input('Do you want to learn? (y/n) --> ')
 
 if choice == 'y':
@@ -36,46 +35,45 @@ if choice == 'y':
 elif choice == 'n':
     trainer.training = False
 
-target = input("Enter the first target : x y radian --> ")
+# Entrée de la première cible
+target = input("Enter the first target: x y radian --> ")
 target = target.split()
 for i in range(len(target)):
     target[i] = float(target[i])
-print('New target : [%d, %d, %d]'%(target[0], target[1], target[2]))
+print('New target: [%f, %f, %f]' % (target[0], target[1], target[2]))
 
+# Boucle d'entraînement
 continue_running = True
-
-
-#-----------------------------------------------------------------------#
-while(continue_running):
-
+while continue_running:
     thread = threading.Thread(target=trainer.train, args=(target,))
     trainer.running = True
     thread.start()
 
-    # Ask for stop running
+    # Demande pour arrêter l'entraînement
     input("Press Enter to stop the current training")
     trainer.running = False
 
-    # Afficher les erreurs après chaque arrêt
+    # Affichage des erreurs et de la position après l'arrêt de l'entraînement
     trainer.plot_errors()
+    trainer.plot_trajectory()  # Ajout de la fonction pour afficher la trajectoire
 
     choice = ''
     while choice != 'y' and choice != 'n':
-        choice = input("Do you want to continue ? (y/n) --> ")
+        choice = input("Do you want to continue? (y/n) --> ")
 
     if choice == 'y':
         choice_learning = ''
         while choice_learning != 'y' and choice_learning != 'n':
-            choice_learning = input('Do you want to learn ? (y/n) --> ')
+            choice_learning = input('Do you want to learn? (y/n) --> ')
         if choice_learning == 'y':
             trainer.training = True
         elif choice_learning == 'n':
             trainer.training = False
-        target = input("Move the robot to the initial point and enter the new target : x y radian --> ")
+        target = input("Move the robot to the initial point and enter the new target: x y radian --> ")
         target = target.split()
         for i in range(len(target)):
             target[i] = float(target[i])
-        print('New target : [%d, %d, %d]' % (target[0], target[1], target[2]))
+        print('New target: [%f, %f, %f]' % (target[0], target[1], target[2]))
     elif choice == 'n':
         continue_running = False
 
