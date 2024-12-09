@@ -51,7 +51,8 @@ class OnlineTrainer:
             
             network_input[0] = (position[0]-target[0])*self.alpha[0]
             network_input[1] = (position[1]-target[1])*self.alpha[1]
-            network_input[2] = (position[2]-target[2]-theta_s(position[0], position[1]))*self.alpha[2]
+            network_input[2] = (position[2]-target[2] - theta_s(position[0], position[1]))*self.alpha[2]
+            #network_input[2] = (position[2]-target[2]-theta_s(position[0], position[1]))*self.alpha[1]
             
             crit_ap= alpha_x*alpha_x*(position[0]-target[0])*(position[0]-target[0]) + alpha_y*alpha_y*(position[1]-target[1])*(position[1]-target[1]) + alpha_teta*alpha_teta*(position[2]-target[2]-theta_s(position[0], position[1]))*(position[2]-target[2]-theta_s(position[0], position[1])) 
 
